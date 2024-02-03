@@ -16,22 +16,37 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import Link from "next/link";
 
 const FormSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
+  songA: z.string().min(2, {
+    message: "Song name must be at least 2 characters.",
   }),
+  songB: z.string().min(2, {
+    message: "Song name must be at least 2 characters.",
+  }),
+  action: z.string(),
 });
 
 export function NewNodeForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      username: "",
+      songA: "",
+      songB: "",
+      action: "doubles_with",
     },
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log(data);
     toast({
       title: "You submitted the following values:",
       description: (
@@ -47,15 +62,52 @@ export function NewNodeForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
         <FormField
           control={form.control}
-          name="username"
+          name="songA"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Node to add</FormLabel>
+              <FormLabel>Song A</FormLabel>
               <FormControl>
-                <Input placeholder="Node text" {...field} />
+                <Input placeholder="Song name A" {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name.
+                This is the base song of the mix or double
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="action"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Action</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an action that pairs these two songs" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="mixes_into">Mixes Into</SelectItem>
+                  <SelectItem value="doubles_with">Doubles With</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="songB"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Song A</FormLabel>
+              <FormControl>
+                <Input placeholder="Song name A" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is the base song of the mix or double
               </FormDescription>
               <FormMessage />
             </FormItem>
