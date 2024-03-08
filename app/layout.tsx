@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Image from "next/image";
 import "./globals.css";
+import { ClerkProvider, UserButton } from "@clerk/nextjs";
+import { User } from "@clerk/nextjs/server";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,17 +19,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="w-full border-b border-gray-300 h-12 bg-white flex items-center px-2 shadow-sm">
-          <Image
-            src="/LogoV2.svg"
-            width={350}
-            height={50}
-            alt="Double Droppr Logo"
-          />
-        </div>
-        {children}
-      </body>
+      <ClerkProvider>
+        <body className={inter.className}>
+          <div className="w-full border-b border-gray-300 h-12 bg-white flex justify-between items-center px-2 shadow-sm">
+            <Image
+              src="/LogoV2.svg"
+              width={350}
+              height={50}
+              alt="Double Droppr Logo"
+            />
+            <UserButton />
+          </div>
+          {children}
+        </body>
+      </ClerkProvider>
     </html>
   );
 }

@@ -24,6 +24,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import Link from "next/link";
+import { useDiagramStore } from "@/lib/zustand/diagramStore";
 
 const FormSchema = z.object({
   songA: z.string().min(2, {
@@ -36,6 +37,9 @@ const FormSchema = z.object({
 });
 
 export function NewNodeForm() {
+  const addNode = useDiagramStore((state) => state.addNode);
+  const addEdge = useDiagramStore((state) => state.addEdge);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -47,72 +51,84 @@ export function NewNodeForm() {
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data);
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    addNode({
+      id: data.songA,
+      data: { label: data.songA },
+      position: { x: 0, y: 0 },
+    });
+    addNode({
+      id: data.songB,
+      data: { label: data.songB },
+      position: { x: 50, y: 0 },
+    });
+    addEdge({
+      id: `${data.songA}-${data.songB}`,
+      source: data.songA,
+      target: data.songB,
     });
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 space-y-6">
-        <FormField
-          control={form.control}
-          name="songA"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Song A</FormLabel>
-              <FormControl>
-                <Input placeholder="Song name A" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is the base song of the mix or double
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="action"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Action</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
+        <div className="grid grid-cols-3 gap-4 w-full">
+          <FormField
+            control={form.control}
+            name="songA"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Song A</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select an action that pairs these two songs" />
-                  </SelectTrigger>
+                  <Input placeholder="Song name A" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="mixes_into">Mixes Into</SelectItem>
-                  <SelectItem value="doubles_with">Doubles With</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="songB"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Song A</FormLabel>
-              <FormControl>
-                <Input placeholder="Song name A" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is the base song of the mix or double
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>
+                  This is the base song of the mix or double
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="action"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Action</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an action that pairs these two songs" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="mixes_into">Mixes Into</SelectItem>
+                    <SelectItem value="doubles_with">Doubles With</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="songB"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Song A</FormLabel>
+                <FormControl>
+                  <Input placeholder="Song name A" {...field} />
+                </FormControl>
+                <FormDescription>
+                  This is the base song of the mix or double
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type="submit">Submit</Button>
       </form>
     </Form>

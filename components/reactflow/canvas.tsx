@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback } from "react";
+import { useDiagramStore } from "@/lib/zustand/diagramStore";
+import React, { useCallback, useEffect } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -19,8 +20,16 @@ const initialNodes = [
 const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
 
 export default function ReactflowCanvas() {
+  const nodeSub = useDiagramStore((state) => state.nodes);
+  const edgesSub = useDiagramStore((state) => state.edges);
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  useEffect(() => {
+    setNodes(nodeSub);
+    setEdges(edgesSub);
+  }, [edgesSub, nodeSub, setEdges, setNodes]);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
